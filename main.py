@@ -58,12 +58,12 @@ def reload_faq_data():
                 questions.append(q)
         
         if questions:
-            # Bổ sung nâng cấp ngram_range để nhận diện cụm từ ghép thông minh hơn
+            # Nhận diện cả từ đơn và cụm từ ghép để tăng độ bao phủ ý nghĩa
             vectorizer = TfidfVectorizer(ngram_range=(1, 2))
             tfidf_matrix = vectorizer.fit_transform(questions)
             faq_database = temp_database
             last_sync_time = time.time()
-            print(f"🔄 [Luxshare] Đã đồng bộ thành công {len(faq_database)} câu hỏi từ Google Sheets.")
+            print(f"🔄 [Luxshare] Đã tự động đồng bộ thành công {len(faq_database)} câu hỏi từ Google Sheets.")
             return True
     except Exception as e:
         print(f"Lỗi đồng bộ: {e}")
@@ -78,7 +78,7 @@ async def get_logo():
         return FileResponse("logo.png")
     return FileResponse(io.BytesIO(requests.get("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR6A7R18_g6nInR9RfeF7b3v82C3tQ7N9F4ng&s").content), media_type="image/png")
 
-# ================= CHUỖI HTML ĐÃ CẬP NHẬT CÁC NÚT BẤM KHỚP VỚI FILE EXCEL MẪU =================
+# ================= CHUỖI HTML GIAO DIỆN CHUYÊN NGHIỆP =================
 HTML_CONTENT = """
 <!DOCTYPE html>
 <html lang="vi">
@@ -253,7 +253,7 @@ HTML_CONTENT = """
 </html>
 """
 
-# ================= ĐỊNH TUYẾN MẶC ĐỊNH VỚI THUẬT TOÁN ĐÃ NÂNG CẤP CHẶN ĐOÁN MÒ =================
+# ================= ĐỊNH TUYẾN MẶC ĐỊNH =================
 
 @app.get("/", response_class=HTMLResponse)
 async def home():
@@ -273,32 +273,21 @@ async def chat_bot(message: str = Form(...)):
     if not user_question:
         return JSONResponse(content={"reply": "Vui lòng nhập nội dung câu hỏi cụ thể.", "file_link": None})
     
-    # BƯỚC 1: Tìm kiếm khớp hoàn toàn (Exact Match) để phản hồi nhanh chính xác tuyệt đối
+    # 1. Khớp hoàn toàn (Exact Match) để phản hồi nhanh
     q_clean = " ".join(user_question.lower().split())
     for item in faq_database:
         if " ".join(item["question"].lower().split()) == q_clean:
             return JSONResponse(content={"reply": item["answer"], "file_link": item["file_link"]})
             
-    # BƯỚC 2: Tìm kiếm tương đồng thông minh bằng TF-IDF cụm từ
+    # 2. Khớp tương đồng nới lỏng thông minh bằng TF-IDF cụm từ
     user_vector = vectorizer.transform([user_question])
     similarities = cosine_similarity(user_vector, tfidf_matrix).flatten()
     
     best_match_idx = similarities.argmax()
     highest_score = similarities[best_match_idx]
-    
-    # BƯỚC 3: Bộ lọc kiểm tra chéo từ khóa cốt lõi chống bốc bừa
-    # Nếu câu hỏi chứa từ khóa cốt lõi quan trọng nhưng câu chọn được lại không chứa từ đó -> Loại bỏ
-    core_keywords = ["ktx", "nghỉ việc", "thẻ", "giấy tờ", "đào tạo", "lương", "xe", "cccd", "quản túc"]
-    user_q_low = user_question.lower()
-    best_q_low = faq_database[best_match_idx]["question"].lower()
-    
-    for kw in core_keywords:
-        if kw in user_q_low and kw not in best_q_low:
-            highest_score = 0  # Ép hạ điểm số về 0 để kích hoạt fallback Zalo
-            break
             
-    # Tăng ngưỡng an toàn lên 0.35 để tránh các câu đoán mò điểm thấp
-    if highest_score > 0.35:
+    # Nới lỏng ngưỡng: Điểm > 0.18 là cho phép trả lời, giúp nhận diện từ gần đúng cực tốt
+    if highest_score > 0.18:
         bot_reply = faq_database[best_match_idx]["answer"]
         file_link = faq_database[best_match_idx]["file_link"]
     else:
