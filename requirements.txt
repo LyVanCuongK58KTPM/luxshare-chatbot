@@ -1,8 +1,8 @@
 fastapi
 uvicorn
-jinja2
 pandas
 openpyxl
-scikit-learn
-python-multipart
 requests
+python-multipart
+google-generativeai
+scikit-learn
