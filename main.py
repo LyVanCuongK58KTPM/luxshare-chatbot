@@ -99,7 +99,7 @@ HTML_CONTENT = """
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Luxshare ICT - Hệ thống hỗ trợ nội bộ</title>
+    <title>Hệ thống hỗ trợ giải đáp các câu hỏi thắc mắc của các bạn sinh viên trong quá trình làm việc tại Luxshare-ICT</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
@@ -121,12 +121,10 @@ HTML_CONTENT = """
                     <h2 class="text-white font-bold text-base tracking-wider uppercase">Luxshare-ICT Việt Nam</h2>
                     <p class="text-slate-300 text-xs mt-0.5 flex items-center">
                         <span class="w-2 h-2 bg-green-400 rounded-none mr-2"></span>
-                        Trợ lý quy chuẩn bảo vệ 2 lớp (AI + Local)
                     </p>
                 </div>
             </div>
             <button onclick="clearChat()" class="text-xs bg-[#0a365c] hover:bg-red-700 text-white font-medium px-3 py-2 border border-transparent hover:border-red-800 transition-colors rounded-none">
-                🗑️ Xóa hội thoại
             </button>
         </div>
 
@@ -152,8 +150,8 @@ HTML_CONTENT = """
         </div>
         
         <div class="bg-slate-100 px-4 py-1.5 text-[10px] text-slate-500 flex justify-between items-center border-t border-slate-200 rounded-none">
-            <span>Engine bảo vệ: Tự động chuyển mạch dự phòng thông minh</span>
-            <span class="font-mono">Trạng thái: Khớp nối 100%</span>
+           
+        
         </div>
     </div>
 
